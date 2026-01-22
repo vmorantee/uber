@@ -85,17 +85,17 @@
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="user-avatar" style="width:28px;height:28px;font-size:0.7rem;">
-                                    <span th:text="${dispute.reporterInitials ?: 'U'}">JK</span>
+                                    <span>U</span>
                                 </div>
-                                <span th:text="${dispute.reporterName ?: ('User #' + dispute.reportingUserId)}">Jan Kowalski</span>
+                                <span th:text="${dispute.reportingUserId != null ? 'User #' + dispute.reportingUserId : 'N/A'}">User #1</span>
                             </div>
                         </td>
                         <td>
-                            <span th:text="${#strings.abbreviate(dispute.reason, 40)}" 
+                            <span th:text="${dispute.reason != null ? #strings.abbreviate(dispute.reason, 40) : 'N/A'}" 
                                   th:title="${dispute.reason}"
                                   style="cursor: help;">Reason text...</span>
                         </td>
-                        <td th:text="${#numbers.formatDecimal(dispute.amount ?: 0, 1, 2)} + ' PLN'">25.00 PLN</td>
+                        <td th:text="${dispute.refundAmount != null ? #numbers.formatDecimal(dispute.refundAmount, 1, 2) + ' PLN' : '0.00 PLN'}">0.00 PLN</td>
                         <td>
                             <span class="badge-status" 
                                   th:classappend="${dispute.status == 'Pending' ? 'badge-pending' : 'badge-approved'}"

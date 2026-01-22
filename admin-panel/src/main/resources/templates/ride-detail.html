@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Ride Details - Admin Panel</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    <i class="bi bi-car-front me-2"></i>Ride #<span th:text="${ride.id}">123</span>
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/rides}" class="text-decoration-none">Rides</a></li>
+                        <li class="breadcrumb-item active" th:text="'Ride #' + ${ride.id}">Ride #123</li>
+                    </ol>
+                </nav>
+            </div>
+            <a th:href="@{/rides}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Rides
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Ride Information -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-info-circle me-2"></i>Ride Information
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small d-block">Status</label>
+                                <span class="badge-status" 
+                                      th:classappend="${ride.status == 'COMPLETED' ? 'badge-approved' : (ride.status == 'CANCELLED' ? 'badge-rejected' : 'badge-pending')}"
+                                      th:text="${ride.status}">COMPLETED</span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small d-block">Price</label>
+                                <span class="fw-semibold fs-5 text-success" th:text="${ride.price != null ? #numbers.formatDecimal(ride.price, 1, 2) + ' PLN' : 'N/A'}">45.50 PLN</span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small d-block">Distance</label>
+                                <span class="fw-semibold" th:text="${ride.distance != null ? #numbers.formatDecimal(ride.distance, 1, 2) + ' km' : 'N/A'}">12.5 km</span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small d-block">Created At</label>
+                                <span class="fw-semibold" th:text="${ride.createdAt != null ? #temporals.format(ride.createdAt, 'dd MMM yyyy, HH:mm') : 'N/A'}">22 Jan 2026, 14:30</span>
+                            </div>
+                            <div class="col-md-6" th:if="${ride.startTime}">
+                                <label class="text-muted small d-block">Start Time</label>
+                                <span class="fw-semibold" th:text="${#temporals.format(ride.startTime, 'dd MMM yyyy, HH:mm')}">22 Jan 2026, 14:35</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route Information -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt me-2"></i>Route Information
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="route-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;min-width:36px;">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </div>
+                                    <div>
+                                        <label class="text-muted small d-block">Pickup Location</label>
+                                        <span class="fw-semibold" th:text="${ride.pickupAddress}">ul. Marszałkowska 1, Warszawa</span>
+                                        <div class="text-muted small" th:if="${ride.pickupLat != null}">
+                                            <i class="bi bi-pin-map me-1"></i>
+                                            <span th:text="${#numbers.formatDecimal(ride.pickupLat, 1, 6) + ', ' + #numbers.formatDecimal(ride.pickupLng, 1, 6)}">52.2297, 21.0122</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="border-start ms-3 ps-4" style="border-width:2px!important;border-style:dashed!important;min-height:30px;"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="route-icon bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;min-width:36px;">
+                                        <i class="bi bi-flag-fill"></i>
+                                    </div>
+                                    <div>
+                                        <label class="text-muted small d-block">Dropoff Location</label>
+                                        <span class="fw-semibold" th:text="${ride.dropoffAddress}">ul. Krakowskie Przedmieście 15, Warszawa</span>
+                                        <div class="text-muted small" th:if="${ride.dropoffLat != null}">
+                                            <i class="bi bi-pin-map me-1"></i>
+                                            <span th:text="${#numbers.formatDecimal(ride.dropoffLat, 1, 6) + ', ' + #numbers.formatDecimal(ride.dropoffLng, 1, 6)}">52.2403, 21.0175</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar - Participants -->
+            <div class="col-lg-4">
+                <!-- Passenger Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-person me-2"></i>Passenger
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="user-avatar" style="width:48px;height:48px;font-size:1rem;">
+                                <span>P</span>
+                            </div>
+                            <div>
+                                <span class="fw-semibold d-block" th:text="${ride.passengerId != null ? 'Passenger #' + ride.passengerId : 'N/A'}">Passenger #1</span>
+                                <a th:if="${ride.passengerId}" th:href="@{/users/{id}(id=${ride.passengerId})}" class="small text-primary text-decoration-none">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>View Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="bi bi-person-badge me-2"></i>Driver
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${ride.driverId}" class="d-flex align-items-center gap-3">
+                            <div class="user-avatar" style="width:48px;height:48px;font-size:1rem;background:linear-gradient(135deg,#10b981,#059669);">
+                                <span>D</span>
+                            </div>
+                            <div>
+                                <span class="fw-semibold d-block" th:text="'Driver #' + ${ride.driverId}">Driver #2</span>
+                                <a th:href="@{/users/{id}(id=${ride.driverId})}" class="small text-primary text-decoration-none">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>View Profile
+                                </a>
+                            </div>
+                        </div>
+                        <div th:unless="${ride.driverId}" class="text-muted text-center py-3">
+                            <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                            No driver assigned
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card mt-4" th:if="${ride.status != 'COMPLETED' and ride.status != 'CANCELLED'}">
+                    <div class="card-header">
+                        <i class="bi bi-lightning me-2"></i>Actions
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/rides/{id}/cancel(id=${ride.id})}" method="post" 
+                              onsubmit="return confirm('Are you sure you want to cancel this ride?');">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Ride
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

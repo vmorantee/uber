@@ -26,9 +26,9 @@
                             <label class="text-muted small d-block">Reporting User</label>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="user-avatar" style="width:32px;height:32px;font-size:0.75rem;">
-                                    <span th:text="${dispute.reporterInitials ?: 'U'}">JK</span>
+                                    <span>U</span>
                                 </div>
-                                <span class="fw-semibold" th:text="${dispute.reporterName ?: ('User #' + dispute.reportingUserId)}">Jan Kowalski</span>
+                                <span class="fw-semibold" th:text="${dispute.reportingUserId != null ? 'User #' + dispute.reportingUserId : 'N/A'}">User #1</span>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -145,17 +145,17 @@
                         <i class="bi bi-check-circle-fill me-2"></i>
                         This dispute has been resolved.
                     </div>
-                    <div class="mb-3" th:if="${dispute.decision}">
+                    <div class="mb-3" th:if="${dispute.resolutionDecision}">
                         <label class="text-muted small d-block">Decision</label>
-                        <span class="fw-semibold" th:text="${dispute.decision}">Refund Passenger</span>
+                        <span class="fw-semibold" th:text="${dispute.resolutionDecision}">Refund Passenger</span>
                     </div>
                     <div class="mb-3" th:if="${dispute.refundAmount}">
                         <label class="text-muted small d-block">Amount</label>
                         <span class="fw-semibold" th:text="${#numbers.formatDecimal(dispute.refundAmount, 1, 2)} + ' PLN'">45.50 PLN</span>
                     </div>
-                    <div th:if="${dispute.resolutionNotes}">
-                        <label class="text-muted small d-block">Notes</label>
-                        <p th:text="${dispute.resolutionNotes}" class="mb-0">Resolution notes here...</p>
+                    <div th:if="${dispute.resolvedAt}">
+                        <label class="text-muted small d-block">Resolved At</label>
+                        <span class="fw-semibold" th:text="${#temporals.format(dispute.resolvedAt, 'dd MMM yyyy, HH:mm')}">22 Jan 2026</span>
                     </div>
                 </div>
             </div>
