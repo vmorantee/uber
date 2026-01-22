@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="hero">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold mb-4">Your Ride, Your Way</h1>
+        <p class="lead mb-4">Experience seamless transportation at your fingertips</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/Home/BecomeDriver" class="btn btn-light btn-lg">Become a Driver</a>
+            <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5" id="features">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">🚗</div>
+            <h3>Fast & Reliable</h3>
+            <p>Get a ride within minutes. Our drivers are always nearby and ready to go.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">💰</div>
+            <h3>Affordable Prices</h3>
+            <p>Transparent pricing with no hidden fees. Know your fare before you book.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="feature-icon">⭐</div>
+            <h3>Top Rated Drivers</h3>
+            <p>All our drivers are verified and highly rated by passengers like you.</p>
+        </div>
+    </div>
+</div>
+
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-4">Drive with Us</h2>
+                <p class="lead">Turn your car into a money-making machine. Set your own schedule and earn on your terms.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ Flexible hours</li>
+                    <li class="mb-2">✓ Weekly payouts</li>
+                    <li class="mb-2">✓ 24/7 driver support</li>
+                    <li class="mb-2">✓ Simple application process</li>
+                </ul>
+                <a href="/Home/BecomeDriver" class="btn btn-primary btn-lg mt-3">Apply Now</a>
+            </div>
+            <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&h=400&fit=crop" alt="Driver" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>

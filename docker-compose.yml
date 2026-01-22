@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: ridesharing-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=RideSharing@2026!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - ridesharing-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P RideSharing@2026! -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: ridesharing-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - ridesharing-network
+    healthcheck:
+      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: ridesharing-logstash
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ridesharing-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: ridesharing-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ridesharing-network
+
+  dotnet-api:
+    build:
+      context: ./backend-dotnet
+      dockerfile: Dockerfile
+    container_name: ridesharing-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=RideSharingDB;User Id=sa;Password=RideSharing@2026!;TrustServerCertificate=True;
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-RideSharingSecretKey2026SuperSecure!AtLeast32Chars}
+      - JWT_ISSUER=${JWT_ISSUER:-RideSharingAPI}
+      - JWT_AUDIENCE=${JWT_AUDIENCE:-RideSharingClients}
+      - AzureServiceBus__ConnectionString=${AZURE_SERVICEBUS_CONNECTION_STRING:-}
+      - AzureBlobStorage__ConnectionString=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - AzureBlobStorage__ContainerName=banners
+      - Elasticsearch__Uri=http://elasticsearch:9200
+    ports:
+      - "5000:5000"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ridesharing-network
+
+  springboot-admin:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+    container_name: ridesharing-admin
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=RideSharingDB;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=RideSharing@2026!
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-RideSharingSecretKey2026SuperSecure!AtLeast32Chars}
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-}
+      - AZURE_STORAGE_CONTAINER_NAME=banners
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ridesharing-network
+
+  aspnet-landing:
+    build:
+      context: ./landing-page
+      dockerfile: Dockerfile
+    container_name: ridesharing-landing
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5001
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=RideSharingDB;User Id=sa;Password=RideSharing@2026!;TrustServerCertificate=True;
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-RideSharingSecretKey2026SuperSecure!AtLeast32Chars}
+      - ApiBaseUrl=http://dotnet-api:5000
+      - Elasticsearch__Uri=http://elasticsearch:9200
+    ports:
+      - "5001:5001"
+    depends_on:
+      - sqlserver
+      - dotnet-api
+      - elasticsearch
+    networks:
+      - ridesharing-network
+
+networks:
+  ridesharing-network:
+    driver: bridge
+
+volumes:
+  sqldata:
+  esdata:

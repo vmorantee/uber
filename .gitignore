@@ -1,0 +1,81 @@
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.cache
+*.dll
+*.exe
+*.pdb
+*.nupkg
+appsettings.Development.json
+appsettings.Local.json
+
+# Java/Spring Boot
+target/
+.gradle/
+build/
+.classpath
+.project
+.settings/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node.js / React Native
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.expo/
+.expo-shared/
+dist/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Database
+*.mdf
+*.ldf
+*.bak
+
+# Docker
+*.log
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+*.Development.json
+*ConnectionStrings*
+
+# Secrets
+secrets/
+*.pfx
+*.pem
+
+# Azure
+*.publishsettings
+*.azurePubxml
+
+# Temporary
+temp/
+tmp/
+*.tmp
+*.temp

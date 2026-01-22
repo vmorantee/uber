@@ -1,0 +1,80 @@
+@model LandingPage.Models.DriverApplicationViewModel
+@{
+    ViewData["Title"] = "Become a Driver";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">Driver Application</h2>
+                    <p class="text-center text-muted mb-4">Join thousands of drivers earning with RideSharing</p>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                        </div>
+                    }
+
+                    <form asp-action="BecomeDriver" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="+1234567890" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" required />
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Vehicle Information</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="VehicleModel" class="form-label">Vehicle Model</label>
+                            <input asp-for="VehicleModel" class="form-control" placeholder="e.g., Toyota Camry 2022" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LicensePlate" class="form-label">License Plate</label>
+                            <input asp-for="LicensePlate" class="form-control" placeholder="e.g., ABC-1234" required />
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the Terms of Service and Privacy Policy
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">Already have an account? <a href="#">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+</div>

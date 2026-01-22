@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, 'Rides')}">
+<div th:fragment="content">
+    <div class="top-navbar">
+        <h1 class="page-title">Ride Management</h1>
+        <div class="d-flex align-items-center gap-3">
+            <input type="text" class="form-control" id="searchRides" placeholder="Search rides..." style="width: 250px;">
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Total Rides</p>
+                        <h3 class="value" th:text="${totalRides ?: #lists.size(rides)}">0</h3>
+                    </div>
+                    <div class="icon blue"><i class="bi bi-car-front-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">In Progress</p>
+                        <h3 class="value text-warning" th:text="${inProgressCount ?: '0'}">2</h3>
+                    </div>
+                    <div class="icon yellow"><i class="bi bi-hourglass-split"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Completed</p>
+                        <h3 class="value text-success" th:text="${completedCount ?: '0'}">45</h3>
+                    </div>
+                    <div class="icon green"><i class="bi bi-check-circle-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Total Revenue</p>
+                        <h3 class="value" th:text="${totalRevenue ?: '0.00'} + ' PLN'">1,234.50 PLN</h3>
+                    </div>
+                    <div class="icon" style="background: rgba(111,66,193,0.1);color:#6f42c1;"><i class="bi bi-wallet-fill"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>All Rides</span>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary active" data-filter="all">All</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-filter="Requested">Requested</button>
+                <button type="button" class="btn btn-sm btn-outline-warning" data-filter="InProgress">In Progress</button>
+                <button type="button" class="btn btn-sm btn-outline-success" data-filter="Completed">Completed</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" data-filter="Cancelled">Cancelled</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table" id="ridesTable">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Passenger</th>
+                        <th>Driver</th>
+                        <th>Pickup</th>
+                        <th>Dropoff</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ride : ${rides}" th:data-status="${ride.status}">
+                        <td class="ps-4 fw-semibold" th:text="'#' + ${ride.id}">1</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="user-avatar" style="width:28px;height:28px;font-size:0.7rem;">
+                                    <span>P</span>
+                                </div>
+                                <span th:text="${ride.passengerId != null ? 'Passenger #' + ride.passengerId : 'N/A'}">Passenger #1</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div th:if="${ride.driverId}" class="d-flex align-items-center gap-2">
+                                <div class="user-avatar" style="width:28px;height:28px;font-size:0.7rem;background:linear-gradient(135deg,#10b981,#059669);">
+                                    <span>D</span>
+                                </div>
+                                <span th:text="${'Driver #' + ride.driverId}">Driver #1</span>
+                            </div>
+                            <span th:unless="${ride.driverId}" class="text-muted">—</span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.abbreviate(ride.pickupAddress ?: ride.pickupLat + ',' + ride.pickupLng, 25)}"
+                                  th:title="${ride.pickupAddress}"
+                                  style="cursor: help;">ul. Marszałkowska 1...</span>
+                        </td>
+                        <td>
+                            <span th:text="${#strings.abbreviate(ride.dropoffAddress ?: ride.dropoffLat + ',' + ride.dropoffLng, 25)}"
+                                  th:title="${ride.dropoffAddress}"
+                                  style="cursor: help;">ul. Krakowskie...</span>
+                        </td>
+                        <td class="fw-semibold" th:text="${#numbers.formatDecimal(ride.price ?: 0, 1, 2)} + ' PLN'">25.00 PLN</td>
+                        <td>
+                            <span class="badge-status" 
+                                  th:classappend="${ride.status == 'Completed' ? 'badge-approved' : 
+                                                   (ride.status == 'InProgress' ? 'badge-pending' : 
+                                                   (ride.status == 'Cancelled' ? 'badge-rejected' : 'badge-pending'))}"
+                                  th:text="${ride.status}">Completed</span>
+                        </td>
+                        <td th:text="${ride.createdAt != null ? #temporals.format(ride.createdAt, 'dd MMM HH:mm') : '—'}">22 Jan 14:30</td>
+                        <td>
+                            <div class="btn-group">
+                                <a th:href="@{/rides/{id}(id=${ride.id})}" 
+                                   class="btn btn-action btn-outline-primary" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(rides)}">
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-car-front fs-1 d-block mb-2"></i>
+                            No rides found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Status filter
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                filterTable();
+            });
+        });
+        
+        // Search filter
+        document.getElementById('searchRides').addEventListener('input', filterTable);
+        
+        function filterTable() {
+            const searchTerm = document.getElementById('searchRides').value.toLowerCase();
+            const activeFilter = document.querySelector('[data-filter].active').dataset.filter;
+            const rows = document.querySelectorAll('#ridesTable tbody tr[data-status]');
+            
+            rows.forEach(row => {
+                const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
+                const matchesSearch = row.textContent.toLowerCase().includes(searchTerm);
+                row.style.display = (matchesStatus && matchesSearch) ? '' : 'none';
+            });
+        }
+    </script>
+</div>
+</html>

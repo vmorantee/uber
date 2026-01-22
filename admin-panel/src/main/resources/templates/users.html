@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, 'Users')}">
+<div th:fragment="content">
+    <div class="top-navbar">
+        <h1 class="page-title">User Management</h1>
+        <div class="d-flex align-items-center gap-3">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-control" placeholder="Search users..." id="searchInput">
+            </div>
+        </div>
+    </div>
+    
+    <div th:if="${message}" class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Total Users</p>
+                        <h3 class="value" th:text="${#lists.size(users)}">0</h3>
+                    </div>
+                    <div class="icon blue"><i class="bi bi-people-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Passengers</p>
+                        <h3 class="value" th:text="${passengerCount ?: '0'}">0</h3>
+                    </div>
+                    <div class="icon green"><i class="bi bi-person-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Approved Drivers</p>
+                        <h3 class="value" th:text="${approvedDriverCount ?: '0'}">0</h3>
+                    </div>
+                    <div class="icon purple"><i class="bi bi-car-front-fill"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="label mb-1">Pending Approval</p>
+                        <h3 class="value" th:text="${pendingDriverCount ?: '0'}">0</h3>
+                    </div>
+                    <div class="icon yellow"><i class="bi bi-hourglass-split"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>All Users</span>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary active" data-filter="all">All</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-filter="Passenger">Passengers</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-filter="Driver">Drivers</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th class="ps-4">User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Phone</th>
+                        <th>Vehicle</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}" th:data-role="${user.role}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" th:text="${#strings.substring(user.firstName ?: 'U', 0, 1) + #strings.substring(user.lastName ?: 'U', 0, 1)}">JK</div>
+                                <div>
+                                    <div class="fw-semibold" th:text="${user.firstName + ' ' + user.lastName}">Jan Kowalski</div>
+                                    <small class="text-muted">ID: <span th:text="${user.id}">1</span></small>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${user.email}">jan@example.com</td>
+                        <td>
+                            <span class="badge-status" 
+                                  th:classappend="${user.role == 'Driver' ? 'badge-driver' : (user.role == 'Admin' ? 'badge-admin' : 'badge-passenger')}"
+                                  th:text="${user.role}">Passenger</span>
+                        </td>
+                        <td th:text="${user.phoneNumber ?: '-'}">+48 123 456 789</td>
+                        <td>
+                            <span th:if="${user.vehicleModel}" th:text="${user.vehicleModel + ' (' + user.licensePlate + ')'}">Toyota (WA123)</span>
+                            <span th:unless="${user.vehicleModel}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${user.role == 'Driver' && user.isDriverApproved}" class="badge-status badge-approved">
+                                <i class="bi bi-check-circle me-1"></i>Approved
+                            </span>
+                            <span th:if="${user.role == 'Driver' && !user.isDriverApproved}" class="badge-status badge-pending">
+                                <i class="bi bi-clock me-1"></i>Pending
+                            </span>
+                            <span th:if="${user.role != 'Driver'}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <form th:if="${user.role == 'Driver' && !user.isDriverApproved}" 
+                                      th:action="@{/users/{id}/approve-driver(id=${user.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-action btn-success" title="Approve Driver">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                                <form th:if="${user.role == 'Driver' && user.isDriverApproved}" 
+                                      th:action="@{/users/{id}/revoke-driver(id=${user.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-action btn-outline-danger" title="Revoke Driver">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                                <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-action btn-outline-primary" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+        
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                const rows = document.querySelectorAll('#usersTable tbody tr');
+                rows.forEach(row => {
+                    if (filter === 'all' || row.dataset.role === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+</html>
