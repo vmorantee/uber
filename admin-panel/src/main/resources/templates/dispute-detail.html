@@ -9,8 +9,8 @@
             <h1 class="page-title mb-0">Dispute #<span th:text="${dispute.id}">123</span></h1>
         </div>
         <span class="badge-status fs-6 px-3 py-2"
-              th:classappend="${dispute.status == 'Pending'} ? 'badge-pending' : 'badge-approved'"
-              th:text="${dispute.status}">Pending</span>
+              th:classappend="${dispute.status == 'OPEN'} ? 'badge-pending' : 'badge-approved'"
+              th:text="${dispute.status}">OPEN</span>
     </div>
     
     <div class="row g-4">
@@ -92,7 +92,7 @@
         
         <!-- Right Column - Resolution Form -->
         <div class="col-lg-5">
-            <div class="card" th:if="${dispute.status == 'Pending'}">
+            <div class="card" th:if="${dispute.status == 'OPEN'}">
                 <div class="card-header">
                     <i class="bi bi-check2-square me-2"></i>Resolution Form
                 </div>
@@ -136,7 +136,7 @@
                 </div>
             </div>
             
-            <div class="card" th:if="${dispute.status != 'Pending'}">
+            <div class="card" th:if="${dispute.status != 'OPEN'}">
                 <div class="card-header text-success">
                     <i class="bi bi-check-circle me-2"></i>Resolution Details
                 </div>

@@ -102,22 +102,22 @@
                             <span th:unless="${ride.driverId}" class="text-muted">—</span>
                         </td>
                         <td>
-                            <span th:text="${#strings.abbreviate(ride.pickupAddress ?: ride.pickupLat + ',' + ride.pickupLng, 25)}"
+                            <span th:text="${ride.pickupAddress}"
                                   th:title="${ride.pickupAddress}"
                                   style="cursor: help;">ul. Marszałkowska 1...</span>
                         </td>
                         <td>
-                            <span th:text="${#strings.abbreviate(ride.dropoffAddress ?: ride.dropoffLat + ',' + ride.dropoffLng, 25)}"
+                            <span th:text="${ride.dropoffAddress}"
                                   th:title="${ride.dropoffAddress}"
                                   style="cursor: help;">ul. Krakowskie...</span>
                         </td>
-                        <td class="fw-semibold" th:text="${#numbers.formatDecimal(ride.price ?: 0, 1, 2)} + ' PLN'">25.00 PLN</td>
+                        <td class="fw-semibold" th:text="${ride.price != null ? #numbers.formatDecimal(ride.price, 1, 2) + ' PLN' : 'N/A'}">25.00 PLN</td>
                         <td>
                             <span class="badge-status" 
-                                  th:classappend="${ride.status == 'Completed' ? 'badge-approved' : 
-                                                   (ride.status == 'InProgress' ? 'badge-pending' : 
-                                                   (ride.status == 'Cancelled' ? 'badge-rejected' : 'badge-pending'))}"
-                                  th:text="${ride.status}">Completed</span>
+                                  th:classappend="${ride.status == 'COMPLETED' ? 'badge-approved' : 
+                                                   (ride.status == 'IN_PROGRESS' or ride.status == 'ACCEPTED' ? 'badge-pending' : 
+                                                   (ride.status == 'CANCELLED' ? 'badge-rejected' : 'badge-pending'))}"
+                                  th:text="${ride.status}">COMPLETED</span>
                         </td>
                         <td th:text="${ride.createdAt != null ? #temporals.format(ride.createdAt, 'dd MMM HH:mm') : '—'}">22 Jan 14:30</td>
                         <td>

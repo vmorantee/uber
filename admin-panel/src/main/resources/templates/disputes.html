@@ -98,17 +98,17 @@
                         <td th:text="${dispute.refundAmount != null ? #numbers.formatDecimal(dispute.refundAmount, 1, 2) + ' PLN' : '0.00 PLN'}">0.00 PLN</td>
                         <td>
                             <span class="badge-status" 
-                                  th:classappend="${dispute.status == 'Pending' ? 'badge-pending' : 'badge-approved'}"
-                                  th:text="${dispute.status}">Pending</span>
+                                  th:classappend="${dispute.status == 'OPEN' ? 'badge-pending' : (dispute.status == 'RESOLVED' ? 'badge-approved' : 'badge-rejected')}"
+                                  th:text="${dispute.status}">OPEN</span>
                         </td>
-                        <td th:text="${#temporals.format(dispute.createdAt, 'dd MMM yyyy HH:mm')}">22 Jan 2026 14:30</td>
+                        <td th:text="${dispute.createdAt != null ? #temporals.format(dispute.createdAt, 'dd MMM yyyy HH:mm') : 'N/A'}">22 Jan 2026 14:30</td>
                         <td>
                             <div class="btn-group">
                                 <a th:href="@{/disputes/{id}(id=${dispute.id})}" 
                                    class="btn btn-action btn-outline-primary" title="View Details">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <form th:if="${dispute.status == 'Pending'}" 
+                                <form th:if="${dispute.status == 'OPEN'}" 
                                       th:action="@{/disputes/{id}/resolve(id=${dispute.id})}" 
                                       method="post" class="d-inline"
                                       onsubmit="return confirm('Are you sure you want to resolve this dispute and refund the user?');">

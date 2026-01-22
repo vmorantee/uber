@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::content})}">
-<head>
-    <title>Ride Details - Admin Panel</title>
-</head>
-<body>
-    <th:block th:fragment="content">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h3 mb-1">
-                    <i class="bi bi-car-front me-2"></i>Ride #<span th:text="${ride.id}">123</span>
-                </h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content}, 'Ride Details')}">
+<div th:fragment="content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-car-front me-2"></i>Ride #<span th:text="${ride.id}">123</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Dashboard</a></li>
                         <li class="breadcrumb-item"><a th:href="@{/rides}" class="text-decoration-none">Rides</a></li>
                         <li class="breadcrumb-item active" th:text="'Ride #' + ${ride.id}">Ride #123</li>
@@ -166,6 +162,6 @@
                 </div>
             </div>
         </div>
-    </th:block>
-</body>
+    </div>
+</div>
 </html>
